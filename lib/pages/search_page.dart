@@ -1,3 +1,9 @@
+/// This file manages the search page of the app
+/// Authors: Albany Patriawan
+/// Author Emails: albanypatriawan@gmail.com
+/// Last Modified: September 13, 2022
+/// Creation Date: June 6, 2022
+///
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -6,6 +12,7 @@ import 'package:my_anime/entities/anime.dart';
 import "package:hive/hive.dart";
 import 'package:provider/provider.dart';
 
+// A widget of the search page of the app
 class SearchPage extends StatefulWidget {
   const SearchPage();
 
@@ -13,13 +20,14 @@ class SearchPage extends StatefulWidget {
   State<SearchPage> createState() => SearchPageState();
 }
 
+// The state of the search page
 class SearchPageState extends State<SearchPage> {
   @override
   void initState() {
     super.initState();
   }
 
-  // settings
+  // Settings
   static const animePerPage = 20;
   static String input = "";
   static int page = 0;
@@ -28,12 +36,13 @@ class SearchPageState extends State<SearchPage> {
   // List<Anime> likedAnimes = [];
   int currentPageIndex = 1;
 
-  // fetch anime data from kitsu API
+  // Fetch anime data from kitsu API
   Future<List<Anime>> animesFuture = getAnimeData(input, page, animePerPage);
 
-  // handles gestures
+  // Handles gestures
   final inputController = TextEditingController();
 
+  // Builds search page widget
   @override
   Widget build(BuildContext context) {
     return buildPage([
@@ -71,10 +80,10 @@ class SearchPageState extends State<SearchPage> {
                 SizedBox(height: 20),
                 Consumer<ListViewModel>(builder: (context, viewModel, child) {
                   return MyListOfAnime(
-                      animesFuture: animesFuture,
-                      page: page,
-                      animePerPage: MyAnimeConstants.animePerPage,
-                      isMyLikedAnimeList: false);
+                    animesFuture: animesFuture,
+                    page: page,
+                    animePerPage: MyAnimeConstants.animePerPage,
+                  );
                 })
               ],
             )

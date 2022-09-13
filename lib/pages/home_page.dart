@@ -1,3 +1,9 @@
+/// This file manages the home page of the app
+/// Authors: Albany Patriawan
+/// Author Emails: albanypatriawan@gmail.com
+/// Last Modified: September 13, 2022
+/// Creation Date: June 6, 2022
+///
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:my_anime/entities/anime.dart';
@@ -5,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 
+// A widget for the home page of the app
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -12,15 +19,15 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
+// The state of the home page widget
 class _HomePageState extends State<HomePage> {
-  static int page = 0;
-  late Box _likedAnimes;
+  static int page = 0; // Current page of the list of animes on the home page
 
-  late Future<List<Anime>> animesFuture;
+  late Future<List<Anime>>
+      animesFuture; // The Future object of list of liked animes
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
@@ -29,20 +36,16 @@ class _HomePageState extends State<HomePage> {
     return buildPage([
       Consumer<ListViewModel>(
         builder: (context, viewModel, child) {
-          print('building home page');
+          // For refreshing the page on pulldown
           return RefreshIndicator(
             onRefresh: updateMyAnimeFuture,
             child: Column(
               children: [
-                Text(
-                    style: TextStyle(color: Colors.white, fontSize: 40),
-                    "Liked Anime"),
                 SizedBox(height: 60),
                 MyListOfAnime(
                     animesFuture: getLikedAnime(),
                     page: page,
-                    animePerPage: MyAnimeConstants.animePerPage,
-                    isMyLikedAnimeList: true),
+                    animePerPage: MyAnimeConstants.animePerPage),
               ],
             ),
           );
@@ -51,6 +54,7 @@ class _HomePageState extends State<HomePage> {
     ]);
   }
 
+  // Refreshes the liked anime
   Future updateMyAnimeFuture() async {
     setState(() {
       animesFuture = getLikedAnime();

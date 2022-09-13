@@ -1,3 +1,9 @@
+/// This file holds many reusable widgets/functions to be used by multiple classes across the app
+/// Authors: Albany Patriwan
+/// Author Emails: albanypatriawan@gmail.com
+/// Last Modified: September 13, 2022
+/// Creation Date: June 6, 2022
+
 import 'package:hive/hive.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
@@ -6,15 +12,8 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 part "anime.g.dart";
 
-/*
-This dart file contains reusable classes/widget-returning functions for the sake of
-DRY principle. 
-
-*/
-
-/* Anime class:
-
-*/
+/// This class holds each individual anime and its respective data.
+/// Input parameters: title (String), image URL (String), description (String)
 @HiveType(typeId: 1)
 class Anime {
   @HiveField(0)
@@ -29,10 +28,15 @@ class Anime {
   Anime(this.canonicalTitle, this.coverImage, this.description);
 }
 
+// This holds static data to be used across the app
 class MyAnimeConstants {
   static const animePerPage = 20;
 }
 
+/// A widget that displays a singular anime and its respective data
+/// Parameters:
+/// index (A number that represents its "position" within the list of displayed animes)
+/// anime (Anime object)
 class MyAnimeCard extends StatefulWidget {
   final int index;
   final Anime anime;
@@ -44,7 +48,7 @@ class MyAnimeCard extends StatefulWidget {
 }
 
 class _MyAnimeCardState extends State<MyAnimeCard> {
-  // initialize anime box
+  // initialize HiveBox of user's locally saved liked animes
   static late Box _likedAnimes;
 
   late bool liked; // card is blue is true, dark grey if false
@@ -52,9 +56,9 @@ class _MyAnimeCardState extends State<MyAnimeCard> {
       milliseconds: 1000); // length of duration based on what is liked or not
 
   late Curve curve = Curves.easeOut; // currently chosen curve
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     // check if anime is liked
@@ -67,6 +71,7 @@ class _MyAnimeCardState extends State<MyAnimeCard> {
     _likedAnimes = Hive.box<Anime>("likedAnimes");
   }
 
+  // Build function of AnimeCard widget
   @override
   Widget build(BuildContext context) {
     // change state of card if anime is liked/not liked
@@ -140,22 +145,26 @@ class _MyAnimeCardState extends State<MyAnimeCard> {
   }
 }
 
+/// A widget that displays a list of Anime card widgets
+/// Input parameters:
+/// animesFuture (A Future object wrapping a list of animes)
+/// page (int)
+/// animePerPage(int)
 class MyListOfAnime extends StatefulWidget {
   Future<List<Anime>> animesFuture;
-  final int page;
-  final int animePerPage;
-  final bool
-      isMyLikedAnimeList; // true if this list is a list of your liked anime, and not a general catalog of animes
+  final int page; // The current page number of the list of animes
+  final int animePerPage; // number of animes to be displayed on the page
+
   MyListOfAnime(
       {required this.animesFuture,
       required this.page,
-      required this.animePerPage,
-      required this.isMyLikedAnimeList});
+      required this.animePerPage});
 
   @override
   State<MyListOfAnime> createState() => _MyListOfAnimeState();
 }
 
+/// The state of MyListOfAnime
 class _MyListOfAnimeState extends State<MyListOfAnime> {
   @override
   Widget build(BuildContext context) {
@@ -164,11 +173,10 @@ class _MyListOfAnimeState extends State<MyListOfAnime> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           List<Anime> animes = snapshot.data!;
-          // animes =
-          // Gesture
           return GridView.count(
             childAspectRatio: 0.52,
             crossAxisCount: 2,
+            // Create a list given the snapshot data of the anime list
             children: List.generate(animes.length, (index) {
               final anime = animes[index];
               return MyAnimeCard(
@@ -197,24 +205,36 @@ bool animeIsLiked(Anime a) {
   return _likedAnimes.get(a.canonicalTitle) != null;
 }
 
+/// A function that fetches anime data from an API of a anime database
+/// Parameters:
+/// - param (String: The filter that allows users to look up specific animes/features)
+/// - page (int: A specified page of the queried results). Due to limitations of KitsuAPI, we can only
+/// - retrieve results of 20 items per page. Therefore, a certain page number must be given to navigate
+/// through all the results from the data fetch (which is most likely above 20 items)
+/// - animePerPage (int: Specificies number of anime per page from the API [Range: 0-20])
+/// Returns: A list of animes wrapped in a Future object
+///
 Future<List<Anime>> getAnimeData([param, page, animePerPage]) async {
   List<Anime> animes = []; // animes list to be returned
   String query =
       "https://kitsu.io/api/edge/anime?page[limit]=${animePerPage}"; // API url
 
-  // Use inputted parameteres for filtering results
+  // If filter is given, specify filter in the query
   if (param != "") {
     query = "${query}&filter[text]${param}";
   }
+
+  // If page is given, specify page in the query
   if (page != null) {
-    print(page);
     query = "${query}&page[offset]=${page}";
   }
+
+  // Wait asynchronously for Response object
   final response = await http.get(Uri.parse(query));
 
   // Successful API fetch
   if (response.statusCode == 200) {
-    // JSON body
+    // Get JSON body
     var body = jsonDecode(response.body);
 
     // Convert JSON body to map
@@ -231,6 +251,7 @@ Future<List<Anime>> getAnimeData([param, page, animePerPage]) async {
           attributes['posterImage']['large'],
           attributes['description'])); // Create Anime object
     }
+
     // Failed API fetch
   } else {
     throw Exception("Failed to load anime");
@@ -239,23 +260,28 @@ Future<List<Anime>> getAnimeData([param, page, animePerPage]) async {
   return animes;
 }
 
+/// A function that gets the user's locally saved anime data
+/// Returns: A list of liked animes wrapped in a Future object
 Future<List<Anime>> getLikedAnime() {
-  // initialize likedAnimes box
+  // Initialize likedAnimes box
   Box _likedAnimes = Hive.box<Anime>("likedAnimes");
 
-  // convert _likedAnimes box to map
+  // Convert _likedAnimes box to map
   Map map = _likedAnimes.toMap();
 
-  // convert map into a list
+  // Convert map into a list
   List<Anime> likedAnimes = [];
   for (var key in map.keys) {
     likedAnimes.add(map[key]);
   }
 
-  // create a future for animes list (asynchronous)
+  // Create a future for animes list (asynchronous)
   return Future.value(likedAnimes);
 }
 
+/// Builds a generic page
+/// Parameters:
+/// - widgets (List<Widget>: A list of widget objects)
 Widget buildPage(List<Widget> widgets) {
   return ListView(children: [
     Container(
@@ -270,28 +296,9 @@ Widget buildPage(List<Widget> widgets) {
   ]);
 }
 
-// used to update liked anime list (in home page) whenever user likes an anime from the search page
+// Used to update liked anime list (in home page) whenever user likes an anime from the search page
 class ListViewModel extends ChangeNotifier {
-  int _current_page = 0;
-
-  int get current_page => _current_page;
-
-  Future<List<Anime>> _futuresMyLikedAnime = getLikedAnime();
-
-  Future<List<Anime>> get futuresMyLikedAnime => _futuresMyLikedAnime;
-
-  // called whenver
-  void updateLikedAnimeList() {
-    _futuresMyLikedAnime = getLikedAnime();
-    notifyListeners();
-  }
-
-  void updatePages() {
-    notifyListeners();
-  }
-
-  void updateCurrentPage(int index) {
-    _current_page = index;
+  void updateCurrentPage() {
     notifyListeners();
   }
 }

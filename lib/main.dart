@@ -1,3 +1,11 @@
+/**
+ * Description: This file is the main file for the entire project
+ * Author names: Albany Patriawan
+ * Author emails: albanypatriawan@gmail.com
+ * Last modified date: September 13, 2022
+ * Creation date: June 18, 2022
+ **/
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -9,6 +17,9 @@ import "package:hive_flutter/hive_flutter.dart";
 import "package:hive/hive.dart";
 import 'package:provider/provider.dart';
 
+/**
+ * This is the main function of the app.
+ */
 void main() async {
   // initialize hive
   await Hive.initFlutter();
@@ -19,21 +30,30 @@ void main() async {
   // open hive box
   var likedAnimes = await Hive.openBox<Anime>("likedAnimes");
 
+  // Run the root widget
   runApp(MyApp());
 }
 
+/**
+ * This is the root of the widget tree
+ */
 class MyApp extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return MyAppState();
   }
 }
 
+/**
+ * This is the state of the root widget
+ */
 class MyAppState extends State<MyApp> {
+  // These are constant/final settings for all UI elements of app
   final Color barColor = Color.fromARGB(255, 37, 37, 37);
   final Color textColor = Color.fromARGB(255, 98, 98, 98);
+  final ThemeData theme = new ThemeData(scaffoldBackgroundColor: Colors.black);
 
+  // This holds all rendered pages of the app
   final pages = [
     HomePage(),
     SearchPage()
@@ -53,7 +73,7 @@ class MyAppState extends State<MyApp> {
         create: (BuildContext context) => ListViewModel(),
         child: Consumer<ListViewModel>(builder: ((context, viewModel, child) {
           return MaterialApp(
-              theme: new ThemeData(scaffoldBackgroundColor: Colors.black),
+              theme: theme,
               home: Scaffold(
                 appBar: AppBar(
                   title: Text("UrAnime",
@@ -87,7 +107,7 @@ class MyAppState extends State<MyApp> {
                   currentIndex: currentPageIndex,
                   onTap: (index) => {
                     // update home page to check if new animes have been liked in search page
-                    if (true) {viewModel.updateCurrentPage(index)},
+                    if (true) {viewModel.updateCurrentPage()},
                     setState(() => currentPageIndex = index)
                   },
                   items: [
@@ -106,45 +126,4 @@ class MyAppState extends State<MyApp> {
               ));
         })));
   }
-}
-
-// Notes
-// // Entry point of application
-// // Special type of function (when you call it main)
-// void main() {
-//   for (int i = 0; i < 5; i++) {
-//     print("hi");
-//   }
-
-//   var p1 = Person("test", 5);  // "new" keyword is not required + positional arguments
-//   var p2 = Person(age: 5, name: "test");  // named arguments used (order does not matter)
-
-//   p1.name = "Bob"
-//   print(p1.name)
-// }
-
-// // Naming convention: Camelcase
-// int addNumbers(int num1, int num2) {
-//   return num1 + num2;
-// }
-
-// class Person {
-//   // We call these "properties" (belongs to class), as opposed to "variables" (belongs to function)
-//   String name;
-//   int age;
-
-// We have to create a constructor
-// Person(String n, int a = 30) { // default value
-//   name = n;
-//   age = a;
-// }
-// }
-
-// SHORTCUT CLASS
-
-class AdvancedPerson {
-  String name;
-  int age;
-
-  AdvancedPerson(this.name, this.age);
 }
