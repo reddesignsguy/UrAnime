@@ -1,16 +1,26 @@
-# my_anime
+Ever wanted to keep track of the anime you've watched? UrAnime has got you covered. 
 
-A new Flutter project.
+Simply look up the animes you've watched and add it to your very own list of animes!
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
+https://user-images.githubusercontent.com/49921782/189976580-13415dec-e528-4f29-8438-d44060d4910f.mov
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Features:
+- Can look up any anime in a database (Provided by KitsuAPI)
+- Can like/dislike any anime
+- Can view liked animes
+
+ Yet-To-Be-Implemented Features:
+ - Be able to view more than one page of an anime query
+ - Be recommended animes based on your past liked anime
+ - Be recommended the "hottest" anime at the moment
+ - View more detail about an anime like description, # episodes, etc.. by clicking on it
+ - Organize animes into custom-made folders like watched, to-be-watched, favorites, etc..
+ 
+ Tools used:
+ - Flutter UI kit
+ - Dart programming language
+ - HiveBox
+ - HTTP data fetching/Kitsu API
